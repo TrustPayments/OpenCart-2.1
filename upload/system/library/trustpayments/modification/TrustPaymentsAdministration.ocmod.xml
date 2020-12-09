@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+	<code>TrustPaymentsAdministration</code>
+	<name>trustpayments administration: complete, refund and void from the OpenCart backend.
+	</name>
+	<version>1.1.0</version>
+	<author>Customweb GmbH</author>
+	<link>http://github.com/trustpayments-payment/opencart</link>
+	<file path="admin/controller/sale/order.php">
+		<operation>
+			<search><![CDATA[
+			$this->response->setOutput($this->load->view('sale/order_info.tpl', $data));
+            ]]></search>
+			<add position="before"><![CDATA[
+			$this->load->model('extension/trustpayments/order');
+			$data['trustpayments_buttons'] = $this->model_extension_trustpayments_order->getButtons((int)$this->request->get['order_id']);
+			$data['trustpayments_failed_jobs'] = $this->model_extension_trustpayments_order->getFailedJobs((int)$this->request->get['order_id']);
+            ]]></add>
+		</operation>
+	</file>
+	<!-- order_info.tpl ajax api callback autoremoves all alerts, so must add 
+		with delay. -->
+	<file path="admin/view/template/sale/order_info.tpl">
+		<operation>
+			<search><![CDATA[
+<div id="content">
+            ]]></search>
+			<add position="after"><![CDATA[
+<script src="view/javascript/trustpayments/order.js"></script>
+]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[
+//--></script>
+            ]]></search>
+			<add position="before"><![CDATA[
+document.orderId = '<?php echo $order_id; ?>';
+document.adminToken = '<?php echo $token; ?>';
+setTrustPaymentsButtons(<?php echo json_encode($trustpayments_buttons); ?>);
+var trustpayments_failed_jobs = <?php echo json_encode($trustpayments_failed_jobs); ?>;
+window.setTimeout(function() {
+	for (var i = 0; i < trustpayments_failed_jobs.length; i++) {
+		addTrustPaymentsError(trustpayments_failed_jobs[i]);
+	}
+}, 500);
+]]></add>
+		</operation>
+	</file>
+</modification>

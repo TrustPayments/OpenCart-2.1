@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+	<code>TrustPaymentsEvents</code>
+	<name>trustpayments events: handle events unavailable in Opencart 2.0.x and 2.1.x.
+	</name>
+	<version>1.1.0</version>
+	<author>Customweb GmbH</author>
+	<link>http://github.com/trustpayments-payment/opencart</link>
+	<file path="catalog/controller/common/header.php">
+		<operation>
+			<search><![CDATA[
+		$data['analytics'] = array();
+            ]]></search>
+			<add position="before"><![CDATA[
+		try{
+			$this->load->controller('extension/trustpayments/event/includeDeviceIdentifier');
+			
+			\TrustPayments\Entity\Cron::cleanUpHangingCrons($this->registry);
+			\TrustPayments\Entity\Cron::insertNewPendingCron($this->registry);
+			$trustpayments_cron_token = \TrustPayments\Entity\Cron::getCurrentSecurityTokenForPendingCron($this->registry);
+			if($trustpayments_cron_token) {
+				$data['trustpayments_cron'] = \TrustPaymentsVersionHelper::createUrl($this->url, 'extension/trustpayments/cron', array('security_token' => $trustpayments_cron_token), $this->config->get('config_secure'));
+			}
+		} catch (Exception $e) { \TrustPaymentsHelper::instance($this->registry)->log($e->getMessage()); }
+            ]]></add>
+		</operation>
+	</file>
+	<file path="admin/controller/extension/modification.php">
+		<operation>
+			<search><![CDATA[
+		// Maintance mode back to original settings
+            ]]></search>
+			<add position="before"><![CDATA[
+		$this->load->controller('extension/trustpayments/event/createMethodConfigurationFiles');
+            ]]></add>
+		</operation>
+	</file>
+</modification>

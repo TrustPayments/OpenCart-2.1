@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+	<code>TrustPaymentsCore</code>
+	<name>trustpayments core: load payment methods.
+	</name>
+	<version>1.1.2</version>
+	<author>Customweb GmbH</author>
+	<link>http://github.com/trustpayments-payment/opencart</link>
+	<file path="admin/controller/extension/payment.php">
+		<operation>
+			<search><![CDATA[
+       				$this->model_extension_extension->uninstall('payment', $value);
+            ]]></search>
+			<add position="replace" offset="2"><![CDATA[
+		            if (strpos($value, 'trustpayments_') === false) {
+		            	$this->model_extension_extension->uninstall('payment', $value);
+		            }
+            ]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[
+       				unset($extensions[$key]);
+            ]]></search>
+			<add position="replace" offset="2"><![CDATA[
+		            if (strpos($value, 'trustpayments_') === false) {
+		            	unset($extensions[$key]);
+		            }
+            ]]></add>
+		</operation>
+	</file>
+	<file path="admin/controller/error/permission.php">
+		<operation>
+			<search><![CDATA[
+				$ignore = array(
+            ]]></search>
+			<add position="after"><![CDATA[
+					'extension/trustpayments',
+            ]]></add>
+		</operation>
+	</file>
+	<!-- order info -->
+	<file path="system/library/language.php">
+		<operation>
+			<search><![CDATA[
+				is_file($file)
+            ]]></search>
+			<add position="replace"><![CDATA[
+				is_file(modification($file))
+            ]]></add>
+		</operation>
+	</file>
+	<file path="system/library/language.php">
+		<operation>
+			<search><![CDATA[
+				file_exists($file)
+            ]]></search>
+			<add position="replace"><![CDATA[
+				file_exists(modification($file))
+            ]]></add>
+		</operation>
+	</file>
+	<file path="system/library/language.php">
+		<operation>
+			<search><![CDATA[
+				require($file)
+            ]]></search>
+			<add position="replace"><![CDATA[
+				require(modification($file))
+            ]]></add>
+		</operation>
+	</file>
+	
+	<file path="system/engine/action.php">
+		<operation>
+			<search><![CDATA[
+	is_file($file)
+            ]]></search>
+			<add position="replace"><![CDATA[
+	is_file(modification($file))
+            ]]></add>
+		</operation>
+	</file>
+	<file path="system/engine/action.php">
+		<operation>
+			<search><![CDATA[
+	is_file($this->file)
+            ]]></search>
+			<add position="replace"><![CDATA[
+	is_file(modification($this->file))
+            ]]></add>
+		</operation>
+	</file>
+	<file path="system/engine/action.php">
+		<operation>
+			<search><![CDATA[
+	include_once($file)
+            ]]></search>
+			<add position="replace"><![CDATA[
+	include_once(modification($file))
+            ]]></add>
+		</operation>
+	</file>
+	<file path="system/engine/loader.php">
+		<operation>
+			<search><![CDATA[
+	is_file($file)
+            ]]></search>
+			<add position="replace"><![CDATA[
+	is_file(modification($file))
+            ]]></add>
+		</operation>
+	</file>
+	<file path="system/engine/loader.php">
+		<operation>
+			<search><![CDATA[
+	file_exists($file)
+            ]]></search>
+			<add position="replace"><![CDATA[
+	file_exists(modification($file))
+            ]]></add>
+		</operation>
+	</file>
+	<file path="system/engine/loader.php">
+		<operation>
+			<search><![CDATA[
+	require($file)
+            ]]></search>
+			<add position="replace"><![CDATA[
+	require(modification($file))
+            ]]></add>
+		</operation>
+	</file>
+	<file path="system/engine/loader.php">
+		<operation>
+			<search><![CDATA[
+	include_once($file)
+            ]]></search>
+			<add position="replace"><![CDATA[
+	include_once(modification($file))
+            ]]></add>
+		</operation>
+	</file>
+</modification>

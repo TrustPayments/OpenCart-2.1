@@ -1,0 +1,10 @@
+<?php
+require_once(modification(DIR_SYSTEM . 'library/trustpayments/dynamic/catalog/controller.php'));
+
+class #classname# extends ControllerExtensionPaymentTrustPaymentsBase {
+	private $code = "#code#";
+
+	protected function getCode(){
+		return $this->code;
+	}
+}

@@ -29,9 +29,21 @@ class Transaction extends AbstractOrderRelated {
 
 	protected function processOrderRelatedInner(array $order_info, $transaction){
 		/* @var \TrustPayments\Sdk\Model\Transaction $transaction */
-		$transaction_info = \TrustPayments\Entity\TransactionInfo::loadByOrderId($this->registry, $order_info['order_id']);
+		$transactionInfo = \TrustPayments\Entity\TransactionInfo::loadByOrderId($this->registry, $order_info['order_id']);
+
+		$finalStates = [
+			\TrustPayments\Sdk\Model\TransactionState::FAILED,
+			\TrustPayments\Sdk\Model\TransactionState::VOIDED,
+			\TrustPayments\Sdk\Model\TransactionState::DECLINE,
+			\TrustPayments\Sdk\Model\TransactionState::FULFILL
+		];
+
 		\TrustPaymentsHelper::instance($this->registry)->ensurePaymentCode($order_info, $transaction);
-		if ($transaction->getState() != $transaction_info->getState()) {
+
+		$transactionInfoState = strtoupper($transactionInfo->getState());
+		if (!in_array($transactionInfoState, $finalStates)) {
+			\TrustPayments\Service\Transaction::instance($this->registry)->updateTransactionInfo($transaction, $order_info['order_id']);
+
 			switch ($transaction->getState()) {
 				case \TrustPayments\Sdk\Model\TransactionState::CONFIRMED:
 					$this->processing($transaction, $order_info);
@@ -49,7 +61,8 @@ class Transaction extends AbstractOrderRelated {
 					$this->failed($transaction, $order_info);
 					break;
 				case \TrustPayments\Sdk\Model\TransactionState::FULFILL:
-					if ($transaction_info->getState() != 'AUTHORIZED' && $transaction_info->getState() != 'COMPLETED') {
+
+					if (!in_array($transactionInfoState, ['AUTHORIZED', 'COMPLETED'])) {
 						$this->authorize($transaction, $order_info);
 					}
 					$this->fulfill($transaction, $order_info);
@@ -65,8 +78,6 @@ class Transaction extends AbstractOrderRelated {
 					break;
 			}
 		}
-		
-		\TrustPayments\Service\Transaction::instance($this->registry)->updateTransactionInfo($transaction, $order_info['order_id']);
 	}
 
 	protected function processing(\TrustPayments\Sdk\Model\Transaction $transaction, array $order_info){

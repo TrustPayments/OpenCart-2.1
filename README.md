@@ -13,7 +13,7 @@ This repository contains the OpenCart  Trust Payments payment module that enable
 
 ## Documentation
 
-* [English](https://plugin-documentation.ep.trustpayments.com/TrustPayments/opencart-2.1/1.0.51/docs/en/documentation.html)
+* [English](https://plugin-documentation.ep.trustpayments.com/TrustPayments/opencart-2.1/1.0.52/docs/en/documentation.html)
 
 ## Support
 
@@ -21,4 +21,4 @@ Support queries can be issued on the [Trust Payments support site](https://www.t
 
 ## License
 
-Please see the [license file](https://github.com/TrustPayments/opencart-2.1/blob/1.0.51/LICENSE) for more information.
+Please see the [license file](https://github.com/TrustPayments/opencart-2.1/blob/1.0.52/LICENSE) for more information.

@@ -3,6 +3,12 @@ require_once (DIR_SYSTEM . 'library/trustpayments/autoload.php');
 require_once DIR_SYSTEM . '/library/trustpayments/version_helper.php';
 
 class TrustPaymentsHelper {
+	
+	
+	const SHOP_SYSTEM = 'x-meta-shop-system';
+	const SHOP_SYSTEM_VERSION = 'x-meta-shop-system-version';
+	const SHOP_SYSTEM_AND_VERSION = 'x-meta-shop-system-and-version';
+
 	const FALLBACK_LANGUAGE = 'en-US';
 	/**
 	 *
@@ -455,8 +461,11 @@ class TrustPaymentsHelper {
 
 	public function refreshApiClient(){
 		$this->apiClient = new TrustPayments\Sdk\ApiClient($this->registry->get('config')->get('trustpayments_user_id'),
-				$this->registry->get('config')->get('trustpayments_application_key'));
+			$this->registry->get('config')->get('trustpayments_application_key'));
 		$this->apiClient->setBasePath(self::getBaseUrl() . "/api");
+		foreach (self::getDefaultHeaderData() as $key => $value) {
+			$this->apiClient->addDefaultHeader($key, $value);
+		}
 		if ($this->registry->get('config')->get('trustpayments_log_level') >= self::LOG_DEBUG) {
 			$this->apiClient->enableDebugging();
 			$this->apiClient->setDebugFile(DIR_LOGS . "trustpayments_communication.log");
@@ -769,5 +778,20 @@ class TrustPaymentsHelper {
 			}
 		}
 		return $result;
+	}
+	
+	
+	/**
+	 * @return array
+	 */
+	protected static function getDefaultHeaderData()
+	{
+		$shop_version = VERSION;
+		[$major_version, $minor_version, $_] = explode('.', $shop_version, 3);
+		return [
+			self::SHOP_SYSTEM             => 'opencart-3',
+			self::SHOP_SYSTEM_VERSION     => $shop_version,
+			self::SHOP_SYSTEM_AND_VERSION => 'opencart-' . $major_version . '.' . $minor_version,
+		];
 	}
 }
